@@ -167,6 +167,42 @@ func TestPublicFilesPathConfiguration(t *testing.T) {
 	assert.Equal(t, publicFilesPath, publicFilesFolderInTest)
 }
 
+func TestPluginAPIGetUserPreference(t *testing.T) {
+	th := Setup(t).InitBasic()
+	defer th.TearDown()
+	api := th.SetupPluginAPI()
+
+	err := api.UpdatePreferencesForUser(th.BasicUser.Id, []model.Preference{
+		{
+			UserId:   th.BasicUser.Id,
+			Category: model.PreferenceCategoryDisplaySettings,
+			Name:     model.PreferenceNameUseMilitaryTime,
+			Value:    "true",
+		},
+		{
+			UserId:   th.BasicUser.Id,
+			Category: "test_category",
+			Name:     "test_key",
+			Value:    "test_value",
+		},
+	})
+	require.Nil(t, err)
+
+	preference, err := api.GetPreferenceForUser(th.BasicUser.Id, model.PreferenceCategoryDisplaySettings, model.PreferenceNameUseMilitaryTime)
+
+	require.Nil(t, err)
+	assert.Equal(t, model.PreferenceCategoryDisplaySettings, preference.Category)
+	assert.Equal(t, model.PreferenceNameUseMilitaryTime, preference.Name)
+	assert.Equal(t, "true", preference.Value)
+
+	preference, err = api.GetPreferenceForUser(th.BasicUser.Id, "test_category", "test_key")
+
+	require.Nil(t, err)
+	assert.Equal(t, "test_category", preference.Category)
+	assert.Equal(t, "test_key", preference.Name)
+	assert.Equal(t, "test_value", preference.Value)
+}
+
 func TestPluginAPIGetUserPreferences(t *testing.T) {
 	th := Setup(t)
 	defer th.TearDown()
@@ -517,7 +553,7 @@ func TestPluginAPIUserCustomStatus(t *testing.T) {
 	defer th.App.PermanentDeleteUser(th.Context, user1)
 
 	custom := &model.CustomStatus{
-		Emoji: ":tada:",
+		Emoji: "tada",
 		Text:  "honk",
 	}
 
@@ -568,7 +604,7 @@ func TestPluginAPIGetFile(t *testing.T) {
 	info, err := th.App.DoUploadFile(th.Context, uploadTime, th.BasicTeam.Id, th.BasicChannel.Id, th.BasicUser.Id, filename, fileData)
 	require.Nil(t, err)
 	defer func() {
-		th.App.Srv().Store().FileInfo().PermanentDelete(info.Id)
+		th.App.Srv().Store().FileInfo().PermanentDelete(th.Context, info.Id)
 		th.App.RemoveFile(info.Path)
 	}()
 
@@ -597,7 +633,7 @@ func TestPluginAPIGetFileInfos(t *testing.T) {
 	)
 	require.Nil(t, err)
 	defer func() {
-		th.App.Srv().Store().FileInfo().PermanentDelete(fileInfo1.Id)
+		th.App.Srv().Store().FileInfo().PermanentDelete(th.Context, fileInfo1.Id)
 		th.App.RemoveFile(fileInfo1.Path)
 	}()
 
@@ -611,7 +647,7 @@ func TestPluginAPIGetFileInfos(t *testing.T) {
 	)
 	require.Nil(t, err)
 	defer func() {
-		th.App.Srv().Store().FileInfo().PermanentDelete(fileInfo2.Id)
+		th.App.Srv().Store().FileInfo().PermanentDelete(th.Context, fileInfo2.Id)
 		th.App.RemoveFile(fileInfo2.Path)
 	}()
 
@@ -625,7 +661,7 @@ func TestPluginAPIGetFileInfos(t *testing.T) {
 	)
 	require.Nil(t, err)
 	defer func() {
-		th.App.Srv().Store().FileInfo().PermanentDelete(fileInfo3.Id)
+		th.App.Srv().Store().FileInfo().PermanentDelete(th.Context, fileInfo3.Id)
 		th.App.RemoveFile(fileInfo3.Path)
 	}()
 
@@ -1351,7 +1387,7 @@ func TestPluginCreatePostWithUploadedFile(t *testing.T) {
 	fileInfo, err := api.UploadFile(data, channelID, filename)
 	require.Nil(t, err)
 	defer func() {
-		th.App.Srv().Store().FileInfo().PermanentDelete(fileInfo.Id)
+		th.App.Srv().Store().FileInfo().PermanentDelete(th.Context, fileInfo.Id)
 		th.App.RemoveFile(fileInfo.Path)
 	}()
 

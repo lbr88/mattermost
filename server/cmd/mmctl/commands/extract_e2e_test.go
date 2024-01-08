@@ -33,7 +33,7 @@ func (s *MmctlE2ETestSuite) TestExtractRunCmdF() {
 
 		err := extractRunCmdF(s.th.Client, cmd, []string{})
 		s.Require().NotNil(err)
-		s.Require().Equal("failed to create content extraction job: : You do not have the appropriate permissions.", err.Error())
+		s.Require().Equal("failed to create content extraction job: You do not have the appropriate permissions.", err.Error())
 		s.Require().Empty(printer.GetLines())
 		s.Require().Empty(printer.GetErrorLines())
 	})
@@ -90,7 +90,7 @@ func (s *MmctlE2ETestSuite) TestExtractJobShowCmdF() {
 
 		err := extractJobShowCmdF(s.th.Client, &cobra.Command{}, []string{job1.Id})
 		s.Require().NotNil(err)
-		s.Require().Equal("failed to get content extraction job: : You do not have the appropriate permissions.", err.Error())
+		s.Require().Equal("failed to get content extraction job: You do not have the appropriate permissions.", err.Error())
 		s.Require().Empty(printer.GetLines())
 		s.Require().Empty(printer.GetErrorLines())
 	})
@@ -100,7 +100,7 @@ func (s *MmctlE2ETestSuite) TestExtractJobShowCmdF() {
 
 		err := extractJobShowCmdF(c, &cobra.Command{}, []string{model.NewId()})
 		s.Require().NotNil(err)
-		s.Require().ErrorContains(err, "failed to get content extraction job: : Unable to get the job.")
+		s.Require().ErrorContains(err, "failed to get content extraction job: Unable to get the job.")
 		s.Require().Empty(printer.GetLines())
 		s.Require().Empty(printer.GetErrorLines())
 	})
@@ -129,7 +129,7 @@ func (s *MmctlE2ETestSuite) TestExtractJobListCmdF() {
 
 		err := extractJobListCmdF(s.th.Client, cmd, nil)
 		s.Require().NotNil(err)
-		s.Require().Equal("failed to get jobs: : You do not have the appropriate permissions.", err.Error())
+		s.Require().Equal("failed to get jobs: You do not have the appropriate permissions.", err.Error())
 		s.Require().Empty(printer.GetLines())
 		s.Require().Empty(printer.GetErrorLines())
 	})
