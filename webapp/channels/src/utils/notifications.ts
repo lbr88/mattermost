@@ -1,6 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import type {ThunkActionFunc} from 'mattermost-redux/types/actions';
+
 import icon50 from 'images/icon50x50.png';
 import iconWS from 'images/icon_WS.png';
 import Constants from 'utils/constants';
@@ -24,7 +26,7 @@ export interface ShowNotificationParams {
     onClick?: (this: Notification, e: Event) => any | null;
 }
 
-export async function showNotification(
+export function showNotification(
     {
         title,
         body,
@@ -37,64 +39,66 @@ export async function showNotification(
         requireInteraction: false,
         silent: false,
     },
-) {
-    let icon = icon50;
-    if (UserAgent.isEdge()) {
-        icon = iconWS;
-    }
+): ThunkActionFunc<Promise<() => void>> {
+    return async function banana() {
+        let icon = icon50;
+        if (UserAgent.isEdge()) {
+            icon = iconWS;
+        }
 
-    if (!('Notification' in window)) {
-        throw new Error('Notification not supported');
-    }
+        if (!('Notification' in window)) {
+            throw new Error('Notification not supported');
+        }
 
-    if (typeof Notification.requestPermission !== 'function') {
-        throw new Error('Notification.requestPermission not supported');
-    }
+        if (typeof Notification.requestPermission !== 'function') {
+            throw new Error('Notification.requestPermission not supported');
+        }
 
-    if (Notification.permission !== 'granted' && requestedNotificationPermission) {
+        if (Notification.permission !== 'granted' && requestedNotificationPermission) {
         // User didn't allow notifications
-        return () => {};
-    }
+            return () => {};
+        }
 
-    requestedNotificationPermission = true;
+        requestedNotificationPermission = true;
 
-    let permission = await Notification.requestPermission();
-    if (typeof permission === 'undefined') {
+        let permission = await Notification.requestPermission();
+        if (typeof permission === 'undefined') {
         // Handle browsers that don't support the promise-based syntax.
-        permission = await new Promise((resolve) => {
-            Notification.requestPermission(resolve);
-        });
-    }
+            permission = await new Promise((resolve) => {
+                Notification.requestPermission(resolve);
+            });
+        }
 
-    if (permission !== 'granted') {
+        if (permission !== 'granted') {
         // User has denied notification for the site
-        return () => {};
-    }
+            return () => {};
+        }
 
-    const notification = new Notification(title, {
-        body,
-        tag: body,
-        icon,
-        requireInteraction,
-        silent,
-    });
+        const notification = new Notification(title, {
+            body,
+            tag: body,
+            icon,
+            requireInteraction,
+            silent,
+        });
 
-    if (onClick) {
-        notification.onclick = onClick;
-    }
+        if (onClick) {
+            notification.onclick = onClick;
+        }
 
-    notification.onerror = () => {
-        throw new Error('Notification failed to show.');
-    };
+        notification.onerror = () => {
+            throw new Error('Notification failed to show.');
+        };
 
-    // Mac desktop app notification dismissal is handled by the OS
-    if (!requireInteraction && !UserAgent.isMacApp()) {
-        setTimeout(() => {
+        // Mac desktop app notification dismissal is handled by the OS
+        if (!requireInteraction && !UserAgent.isMacApp()) {
+            setTimeout(() => {
+                notification.close();
+            }, Constants.DEFAULT_NOTIFICATION_DURATION);
+        }
+
+        return () => {
             notification.close();
-        }, Constants.DEFAULT_NOTIFICATION_DURATION);
-    }
-
-    return () => {
-        notification.close();
+        };
     };
 }

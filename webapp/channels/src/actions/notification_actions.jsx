@@ -318,7 +318,7 @@ export const notifyMe = (title, body, channel, teamId, silent, soundName, url) =
     if (isDesktopApp()) {
         DesktopApp.dispatchNotification(title, body, channel.id, teamId, silent, soundName, url);
     } else {
-        showNotification({
+        dispatch(showNotification({
             title,
             body,
             requireInteraction: false,
@@ -327,7 +327,7 @@ export const notifyMe = (title, body, channel, teamId, silent, soundName, url) =
                 window.focus();
                 getHistory().push(url);
             },
-        }).catch((error) => {
+        })).catch((error) => {
             dispatch(logError(error));
         });
     }
