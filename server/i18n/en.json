@@ -8611,6 +8611,18 @@
     "translation": "Allowing cookies for subdomains requires SiteURL to be set."
   },
   {
+    "id": "model.config.is_valid.cache_type.app_error",
+    "translation": "Cache type must be either lru or redis."
+  },
+  {
+    "id": "model.config.is_valid.empty_redis_address.app_error",
+    "translation": "RedisAddress must be specified for redis cache type."
+  },
+  {
+    "id": "model.config.is_valid.invalid_redis_db.app_error",
+    "translation": "Redis DB must have a value greater or equal to zero."
+  },
+  {
     "id": "model.config.is_valid.amazons3_timeout.app_error",
     "translation": "Invalid timeout value {{.Value}}. Should be a positive number."
   },
