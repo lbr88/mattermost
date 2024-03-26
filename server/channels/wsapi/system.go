@@ -11,7 +11,6 @@ import (
 func (api *API) InitSystem() {
 	api.Router.Handle("ping", api.APIWebSocketHandler(ping))
 	api.Router.Handle("websocket_posted_ack", api.APIWebSocketHandler(api.websocketNotificationAck))
-
 }
 
 func ping(req *model.WebSocketRequest) (map[string]any, *model.AppError) {
