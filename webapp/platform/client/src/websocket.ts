@@ -421,7 +421,7 @@ export default class WebSocketClient {
             data: postedData,
         };
 
-        this.sendMessage('websocket_posted_ack', data);
+        this.sendMessage('posted_ack', data);
     }
 
     getStatuses(callback?: () => void) {
