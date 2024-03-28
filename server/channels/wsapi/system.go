@@ -28,7 +28,7 @@ func (api *API) websocketNotificationAck(req *model.WebSocketRequest) (map[strin
 	api.App.Metrics().IncrementWebsocketEvent(model.WebsocketPostedAck)
 
 	// Log if the websocket event resulted in a notification
-	api.App.NotificationsLog().Trace("Websocket notification acknowledgment",
+	api.App.NotificationsLog().Debug("Websocket notification acknowledgment",
 		mlog.String("type", model.TypeWebsocket),
 		mlog.String("user_id", req.Session.UserId),
 		mlog.Any("user_agent", req.Data["user_agent"]),
